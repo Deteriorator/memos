@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -14,8 +15,12 @@ import (
 )
 
 func (s *APIV1Service) GetActivity(ctx context.Context, request *v1pb.GetActivityRequest) (*v1pb.Activity, error) {
+	activityID, err := ExtractActivityIDFromName(request.Name)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid activity name: %v", err)
+	}
 	activity, err := s.Store.GetActivity(ctx, &store.FindActivity{
-		ID: &request.Id,
+		ID: &activityID,
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get activity: %v", err)
@@ -30,8 +35,8 @@ func (s *APIV1Service) GetActivity(ctx context.Context, request *v1pb.GetActivit
 
 func (*APIV1Service) convertActivityFromStore(_ context.Context, activity *store.Activity) (*v1pb.Activity, error) {
 	return &v1pb.Activity{
-		Id:         activity.ID,
-		CreatorId:  activity.CreatorID,
+		Name:       fmt.Sprintf("%s%d", ActivityNamePrefix, activity.ID),
+		Creator:    fmt.Sprintf("%s%d", UserNamePrefix, activity.CreatorID),
 		Type:       activity.Type.String(),
 		Level:      activity.Level.String(),
 		CreateTime: timestamppb.New(time.Unix(activity.CreatedTs, 0)),

@@ -1,7 +1,9 @@
 import clsx from "clsx";
+import useDebounce from "react-use/lib/useDebounce";
 import SearchBar from "@/components/SearchBar";
-import UserStatisticsView from "@/components/UserStatisticsView";
+import StatisticsView from "@/components/StatisticsView";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { useMemoList, useUserStatsStore } from "@/store/v1";
 import TagsSection from "./TagsSection";
 
 interface Props {
@@ -10,6 +12,16 @@ interface Props {
 
 const HomeSidebar = (props: Props) => {
   const currentUser = useCurrentUser();
+  const memoList = useMemoList();
+  const userStatsStore = useUserStatsStore();
+
+  useDebounce(
+    async () => {
+      await userStatsStore.listUserStats(currentUser.name);
+    },
+    300,
+    [memoList.size(), userStatsStore.stateId, currentUser],
+  );
 
   return (
     <aside
@@ -19,7 +31,7 @@ const HomeSidebar = (props: Props) => {
       )}
     >
       <SearchBar />
-      <UserStatisticsView user={currentUser} />
+      <StatisticsView />
       <TagsSection />
     </aside>
   );

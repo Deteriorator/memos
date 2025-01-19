@@ -1,7 +1,7 @@
 import { DndContext, closestCenter, MouseSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { XIcon } from "lucide-react";
 import { Resource } from "@/types/proto/api/v1/resource_service";
-import Icon from "../Icon";
 import ResourceIcon from "../ResourceIcon";
 import SortableItem from "./SortableItem";
 
@@ -33,7 +33,7 @@ const ResourceListView = (props: Props) => {
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={resourceList.map((resource) => resource.name)} strategy={verticalListSortingStrategy}>
         {resourceList.length > 0 && (
-          <div className="w-full flex flex-row justify-start flex-wrap gap-2 mt-2">
+          <div className="w-full flex flex-row justify-start flex-wrap gap-2 mt-2 max-h-[50vh] overflow-y-auto">
             {resourceList.map((resource) => {
               return (
                 <div
@@ -45,7 +45,7 @@ const ResourceListView = (props: Props) => {
                     <span className="text-sm max-w-[8rem] truncate">{resource.filename}</span>
                   </SortableItem>
                   <button className="shrink-0" onClick={() => handleDeleteResource(resource.name)}>
-                    <Icon.X className="w-4 h-auto cursor-pointer opacity-60 hover:opacity-100" />
+                    <XIcon className="w-4 h-auto cursor-pointer opacity-60 hover:opacity-100" />
                   </button>
                 </div>
               );

@@ -95,6 +95,7 @@
   },
   "memo": {
     "archived-at": "アーカイブ:",
+    "code": "コード",
     "comment": {
       "self": "コメント",
       "write-a-comment": "コメントを書く"
@@ -106,9 +107,12 @@
     "embed": "埋め込む",
     "fetch-more": "クリックしてさらに取得する",
     "fetching-data": "取得中…",
+    "links": "リンク",
     "no-archived-memos": "アーカイブされたメモはありません。",
     "search-placeholder": "メモを検索",
     "show-more": "続きを見る",
+    "show-less": "表示を少なくする",
+    "to-do": "To-do",
     "view-detail": "詳細を見る",
     "visibility": {
       "disabled": "公開メモは無効化されています。",
@@ -116,7 +120,8 @@
       "protected": "メンバーに表示",
       "public": "公開メモ"
     },
-    "wrapping": "ラッピング"
+    "remove-completed-task-list-items": "完了を削除",
+    "remove-completed-task-list-items-confirm": "すべての完了したタスクを削除してもよろしいですか？（このアクションは取り消せません）"
   },
   "message": {
     "archived-successfully": "アーカイブが完了しました",
@@ -133,7 +138,8 @@
     "restored-successfully": "リストア成功",
     "succeed-copy-link": "リンクのコピーに成功しました。",
     "update-succeed": "変更は保存されました",
-    "user-not-found": "ユーザーが見つかりませんでした"
+    "user-not-found": "ユーザーが見つかりませんでした",
+    "remove-completed-task-list-items-successfully": "削除が成功しました！"
   },
   "reference": {
     "add-references": "変更は保存されました",
@@ -205,6 +211,7 @@
       "delete-member": "メンバーを消去する",
       "delete-warning": "本当に{{username}}を消去していいですか?\n\n消去後、元に戻せません！"
     },
+    "memo-related": "Memo",
     "my-account": "アカウント設定",
     "preference": "設定",
     "preference-section": {
@@ -288,11 +295,14 @@
       "disable-password-login-warning": "これにより、すべてのユーザーのパスワードでのログインが無効になります。設定済みのIDプロバイダーが失敗した場合、この設定をデータベースで元に戻さない限り、ログインすることはできません。IDプロバイダーを削除する際も、非常に注意が必要です",
       "disable-public-memos": "公開メモを無効化する",
       "display-with-updated-time": "更新日時を表示する",
+      "enable-auto-compact": "折りたたみを有効化",
+      "enable-double-click-to-edit": "ダブルクリックで編集を有効化",
       "enable-password-login": "パスワードでのログインを有効にする",
       "enable-password-login-warning": "これにより、すべてのユーザーのパスワードでのログインが有効になります。SSOとパスワードの両方を使用してログインできるようにしたい場合のみ、続行してください",
       "max-upload-size": "最大ファイルサイズ(MiB)",
       "max-upload-size-hint": "推奨サイズは32 MiBです。",
-      "server-name": "サーバーの名前"
+      "server-name": "サーバーの名前",
+      "removed-completed-task-list-items": "完了削除を有効にする"
     }
   },
   "tag": {

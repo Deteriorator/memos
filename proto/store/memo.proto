@@ -5,12 +5,25 @@ package memos.store;
 option go_package = "gen/store";
 
 message MemoPayload {
-  // property is the memo's property.
   Property property = 1;
 
+  Location location = 2;
+
+  repeated string tags = 3;
+
+  // The references of the memo. Should be a list of uuid.
+  repeated string references = 4;
+
   message Property {
-    repeated string tags = 1;
-    bool has_link = 2;
-    bool has_task_list = 3;
+    bool has_link = 1;
+    bool has_task_list = 2;
+    bool has_code = 3;
+    bool has_incomplete_tasks = 4;
+  }
+
+  message Location {
+    string placeholder = 1;
+    double latitude = 2;
+    double longitude = 3;
   }
 }

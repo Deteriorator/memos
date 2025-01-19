@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import useLoading from "@/hooks/useLoading";
 import useNavigateTo from "@/hooks/useNavigateTo";
 import { useMemoStore } from "@/store/v1";
+import { RendererContext } from "../types";
 import Error from "./Error";
 
 interface Props {
@@ -9,29 +10,34 @@ interface Props {
   params: string;
 }
 
-const ReferencedMemo = ({ resourceId, params: paramsStr }: Props) => {
+const ReferencedMemo = ({ resourceId: uid, params: paramsStr }: Props) => {
   const navigateTo = useNavigateTo();
   const loadingState = useLoading();
   const memoStore = useMemoStore();
-  const memo = memoStore.getMemoByUid(resourceId);
+  const memo = memoStore.getMemoByUid(uid);
   const params = new URLSearchParams(paramsStr);
+  const context = useContext(RendererContext);
 
   useEffect(() => {
-    memoStore.searchMemos(`uid == "${resourceId}" && include_comments == true`).finally(() => loadingState.setFinish());
-  }, [resourceId]);
+    memoStore.fetchMemoByUid(uid).finally(() => loadingState.setFinish());
+  }, [uid]);
 
   if (loadingState.isLoading) {
     return null;
   }
   if (!memo) {
-    return <Error message={`Memo not found: ${resourceId}`} />;
+    return <Error message={`Memo not found: ${uid}`} />;
   }
 
   const paramsText = params.has("text") ? params.get("text") : undefined;
-  const displayContent = paramsText || (memo.content.length > 12 ? `${memo.content.slice(0, 12)}...` : memo.content);
+  const displayContent = paramsText || (memo.snippet.length > 12 ? `${memo.snippet.slice(0, 12)}...` : memo.snippet);
 
   const handleGotoMemoDetailPage = () => {
-    navigateTo(`/m/${memo.uid}`);
+    navigateTo(`/m/${memo.uid}`, {
+      state: {
+        from: context.parentPage,
+      },
+    });
   };
 
   return (

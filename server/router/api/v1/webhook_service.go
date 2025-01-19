@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -14,7 +15,7 @@ import (
 )
 
 func (s *APIV1Service) CreateWebhook(ctx context.Context, request *v1pb.CreateWebhookRequest) (*v1pb.Webhook, error) {
-	currentUser, err := getCurrentUser(ctx, s.Store)
+	currentUser, err := s.GetCurrentUser(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get user: %v", err)
 	}
@@ -31,8 +32,13 @@ func (s *APIV1Service) CreateWebhook(ctx context.Context, request *v1pb.CreateWe
 }
 
 func (s *APIV1Service) ListWebhooks(ctx context.Context, request *v1pb.ListWebhooksRequest) (*v1pb.ListWebhooksResponse, error) {
+	creatorID, err := ExtractUserIDFromName(request.Creator)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid creator name: %v", err)
+	}
+
 	webhooks, err := s.Store.ListWebhooks(ctx, &store.FindWebhook{
-		CreatorID: &request.CreatorId,
+		CreatorID: &creatorID,
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list webhooks, error: %+v", err)
@@ -48,7 +54,7 @@ func (s *APIV1Service) ListWebhooks(ctx context.Context, request *v1pb.ListWebho
 }
 
 func (s *APIV1Service) GetWebhook(ctx context.Context, request *v1pb.GetWebhookRequest) (*v1pb.Webhook, error) {
-	currentUser, err := getCurrentUser(ctx, s.Store)
+	currentUser, err := s.GetCurrentUser(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get user: %v", err)
 	}
@@ -74,9 +80,6 @@ func (s *APIV1Service) UpdateWebhook(ctx context.Context, request *v1pb.UpdateWe
 	update := &store.UpdateWebhook{}
 	for _, field := range request.UpdateMask.Paths {
 		switch field {
-		case "row_status":
-			rowStatus := store.RowStatus(request.Webhook.RowStatus.String())
-			update.RowStatus = &rowStatus
 		case "name":
 			update.Name = &request.Webhook.Name
 		case "url":
@@ -103,12 +106,11 @@ func (s *APIV1Service) DeleteWebhook(ctx context.Context, request *v1pb.DeleteWe
 
 func convertWebhookFromStore(webhook *store.Webhook) *v1pb.Webhook {
 	return &v1pb.Webhook{
-		Id:          webhook.ID,
-		CreatedTime: timestamppb.New(time.Unix(webhook.CreatedTs, 0)),
-		UpdatedTime: timestamppb.New(time.Unix(webhook.UpdatedTs, 0)),
-		RowStatus:   convertRowStatusFromStore(webhook.RowStatus),
-		CreatorId:   webhook.CreatorID,
-		Name:        webhook.Name,
-		Url:         webhook.URL,
+		Id:         webhook.ID,
+		CreateTime: timestamppb.New(time.Unix(webhook.CreatedTs, 0)),
+		UpdateTime: timestamppb.New(time.Unix(webhook.UpdatedTs, 0)),
+		Creator:    fmt.Sprintf("%s%d", UserNamePrefix, webhook.CreatorID),
+		Name:       webhook.Name,
+		Url:        webhook.URL,
 	}
 }

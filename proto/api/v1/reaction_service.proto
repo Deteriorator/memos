@@ -8,25 +8,12 @@ message Reaction {
   int32 id = 1;
 
   // The name of the creator.
-  // Format: users/{id}
+  // Format: users/{user}
   string creator = 2;
 
+  // The content identifier.
+  // For memo, it should be the `Memo.name`.
   string content_id = 3;
 
-  enum Type {
-    TYPE_UNSPECIFIED = 0;
-    THUMBS_UP = 1;
-    THUMBS_DOWN = 2;
-    HEART = 3;
-    FIRE = 4;
-    CLAPPING_HANDS = 5;
-    LAUGH = 6;
-    OK_HAND = 7;
-    ROCKET = 8;
-    EYES = 9;
-    THINKING_FACE = 10;
-    CLOWN_FACE = 11;
-    QUESTION_MARK = 12;
-  }
-  Type reaction_type = 4;
+  string reaction_type = 4;
 }

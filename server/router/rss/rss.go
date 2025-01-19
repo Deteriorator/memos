@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gorilla/feeds"
 	"github.com/labstack/echo/v4"
-	"github.com/yourselfhosted/gomark"
-	"github.com/yourselfhosted/gomark/ast"
-	"github.com/yourselfhosted/gomark/renderer"
+	"github.com/usememos/gomark"
+	"github.com/usememos/gomark/renderer"
 
 	storepb "github.com/usememos/memos/proto/gen/store"
 	"github.com/usememos/memos/server/profile"
@@ -20,8 +18,7 @@ import (
 )
 
 const (
-	maxRSSItemCount       = 100
-	maxRSSItemTitleLength = 128
+	maxRSSItemCount = 100
 )
 
 type RSSService struct {
@@ -112,7 +109,6 @@ func (s *RSSService) generateRSSFromMemoList(ctx context.Context, memoList []*st
 			return "", err
 		}
 		feed.Items[i] = &feeds.Item{
-			Title:       getRSSItemTitle(memo.Content),
 			Link:        &feeds.Link{Href: baseURL + "/m/" + memo.UID},
 			Description: description,
 			Created:     time.Unix(memo.CreatedTs, 0),
@@ -129,7 +125,7 @@ func (s *RSSService) generateRSSFromMemoList(ctx context.Context, memoList []*st
 			if resource.StorageType == storepb.ResourceStorageType_EXTERNAL || resource.StorageType == storepb.ResourceStorageType_S3 {
 				enclosure.Url = resource.Reference
 			} else {
-				enclosure.Url = fmt.Sprintf("%s/file/resources/%d", baseURL, resource.ID)
+				enclosure.Url = fmt.Sprintf("%s/file/resources/%d/%s", baseURL, resource.ID, resource.Filename)
 			}
 			enclosure.Length = strconv.Itoa(int(resource.Size))
 			enclosure.Type = resource.Type
@@ -142,22 +138,6 @@ func (s *RSSService) generateRSSFromMemoList(ctx context.Context, memoList []*st
 		return "", err
 	}
 	return rss, nil
-}
-
-func getRSSItemTitle(content string) string {
-	nodes, _ := gomark.Parse(content)
-	if len(nodes) > 0 {
-		firstNode := nodes[0]
-		title := renderer.NewStringRenderer().Render([]ast.Node{firstNode})
-		return title
-	}
-
-	title := strings.Split(content, "\n")[0]
-	var titleLengthLimit = min(len(title), maxRSSItemTitleLength)
-	if titleLengthLimit < len(title) {
-		title = title[:titleLengthLimit] + "..."
-	}
-	return title
 }
 
 func getRSSItemDescription(content string) (string, error) {
